@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang='en'>
+  <head>
+    <link rel="stylesheet" href="sample.css">
+  </head>
+  <body>
+    <div class="container"></div>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="../dist/intrinio-realtime.js"></script>
+    <script>
+      var $ = jQuery
+      $(document).ready(function() {
+        var ir = new IntrinioRealtime({
+          public_key: "YOUR_INTRINIO_PUBLIC_ACCESS_KEY",
+          provider: "iex"
+        })
+
+        // Listen for quotes
+        ir.onQuote(function(quote) {
+          var ticker = quote.ticker,
+              type = quote.type,
+              price = quote.price,
+              size = quote.size,
+              timestamp = quote.timestamp;
+              
+          console.log(quote)
+
+          var el = $.parseHTML('<div class="quote '+type+'">'+ticker+' $'+price+'</div>')
+          $('.container').prepend(el)
+          if ($('.container div').length > 500) {
+            $('.container div:last-child').remove()
+          }
+        });
+        
+        // Join channels
+        ir.join("AAPL","GE","MSFT")
+      })
+    </script>
+  </body>
+</html>
