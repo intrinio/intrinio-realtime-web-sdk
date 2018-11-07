@@ -33,8 +33,15 @@ var IntrinioRealtime = function () {
       this._throw("Need a valid options parameter");
     }
 
-    if (!options.public_key) {
-      this._throw("Need a valid public_key");
+    if (options.api_key) {
+      if (!_validAPIKey(options.api_key)) {
+        this._throw("API Key was formatted invalidly")
+      }
+    }
+    else {
+      if (!options.public_key) {
+        this._throw("API key or public key are required");
+      }
     }
 
     if (options.provider != "iex") {
@@ -53,6 +60,18 @@ var IntrinioRealtime = function () {
     this.heartbeat_ref = setInterval(function () {
       _this._heartbeat();
     }, HEARTBEAT_INTERVAL);
+  }
+
+  function _validAPIKey(api_key) {
+    if (typeof api_key !== 'string') {
+      return false
+    }
+
+    if (api_key === "") {
+      return false
+    }
+
+    return true
   }
 
   _createClass(IntrinioRealtime, [{
@@ -132,13 +151,19 @@ var IntrinioRealtime = function () {
       return new Promise(function (fulfill, reject) {
         var _options = _this3.options,
             public_key = _options.public_key,
+            api_key = _options.api_key,
             provider = _options.provider;
 
         // Get token
 
         var url = "";
         if (provider == "iex") {
-          url = "https://realtime.intrinio.com/auth";
+          if (api_key) {
+            url = "https://realtime.intrinio.com/auth?api_key=" + api_key;
+          }
+          else {
+            url = "https://realtime.intrinio.com/auth";
+          }
         }
 
         var xmlhttp = new XMLHttpRequest();
@@ -160,7 +185,9 @@ var IntrinioRealtime = function () {
         };
         xmlhttp.open("GET", url, true);
         xmlhttp.setRequestHeader('Content-Type', 'application/json');
-        xmlhttp.setRequestHeader('Authorization', 'Public ' + public_key);
+        if (!api_key) {
+          xmlhttp.setRequestHeader('Authorization', 'Public ' + public_key);
+        }
         xmlhttp.send();
       });
     }
