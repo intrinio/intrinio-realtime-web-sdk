@@ -19,7 +19,7 @@ To use the SDK, include the script (found in `/dist` folder of this repository) 
 ```javascript
 // Create an IntrinioRealtime instance
 var ir = new IntrinioRealtime({
-  public_key: "YOUR_INTRINIO_PUBLIC_ACCESS_KEY",
+  api_key: "YOUR_INTRINIO_API_KEY",
   provider: "iex"
 })
 
@@ -32,7 +32,10 @@ ir.onQuote(function(quote) {
 ir.join("AAPL","GE","MSFT")
 ```
 
-For another example, see the `/sample` folder. Make sure to substitute your own Public Access Key.
+For another example, see the `/sample` folder. Make sure to substitute your own API Key.
+
+## API Key
+You will receive your Intrinio API Key after [creating an account](https://intrinio.com/signup). The key will appear on your Account page, which you will need for to use the SDK. You will also need a subscription to a [real-time data feed](https://intrinio.com/marketplace/data/prices/realtime) for one of the providers listed below.
 
 ## Public Access Key
 You can create a Public Access Key after [creating an account](https://intrinio.com/signup). On your Account page, scroll down to Access Keys, click Add New Key, name it, and specify Public. The key will appear on your Account page, which you will need for to use the SDK. You will also need a subscription to a [real-time data feed](https://intrinio.com/marketplace/data/prices/realtime) for one of the providers listed below.
@@ -80,10 +83,10 @@ Special access is required for both lobby channels. [Contact us](mailto:sales@in
 ### Methods
 
 `constructor(options)` - Creates a new instance of the IntrinioRealtime client.
-* **Parameter** `options`: An object with a `public_key` property corresponding to your Intrinio Public Access Key, as well as a `provider` property designating which realtime vendor to use (currently only "iex" is supported).
+* **Parameter** `options`: An object with a `api_key` property corresponding to your Intrinio API Key or a `public_key` property corresponding to your Intrinio Public Access Key, as well as a `provider` property designating which realtime vendor to use (currently only "iex" is supported).
 ```javascript
 var ir = new IntrinioRealtime({
-  public_key: "YOUR_INTRINIO_PUBLIC_ACCESS_KEY",
+  api_key: "YOUR_INTRINIO_API_KEY",
   provider: "iex"
 })
 ```
