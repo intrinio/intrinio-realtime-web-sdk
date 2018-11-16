@@ -73,7 +73,7 @@ Each data provider has a different format for their quote data.
 ### Cryptoquote
 
 #### Book Update
-```ruby
+```javascript
 { pair: {
     name: "BTCUSD",
     code: "btcusd"
@@ -105,7 +105,7 @@ Each data provider has a different format for their quote data.
   *    **`trade`** - a trade message (updating `last_trade_price`, `last_trade_time`, and `last_trade_size`)
 
 #### Ticker
-```ruby
+```javascript
 { last_updated: "2018-10-29 23:08:02.277Z",
   pair: {
     name: "BTCUSD",
@@ -161,7 +161,7 @@ Each data provider has a different format for their quote data.
   *    **`trade`** - a trade message (updating `last_trade_price`, `last_trade_time`, and `last_trade_size`)
 
 #### Trade
-```ruby
+```javascript
 { last_updated: "2018-10-29 23:08:02.277Z",
   pair: {
     name: "BTCUSD",
