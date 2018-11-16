@@ -158,12 +158,18 @@ var IntrinioRealtime = function () {
 
         var url = "";
         if (provider == "iex") {
-          if (api_key) {
-            url = "https://realtime.intrinio.com/auth?api_key=" + api_key;
+          url = "https://realtime.intrinio.com/auth";
+        }
+
+        if (api_key) {
+          if (api_key.includes("?")) {
+            url = url + "&"
           }
           else {
-            url = "https://realtime.intrinio.com/auth";
+            url = url + "?"
           }
+
+          url = url + "api_key=" + api_key
         }
 
         var xmlhttp = new XMLHttpRequest();
