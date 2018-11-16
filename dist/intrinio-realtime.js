@@ -11,6 +11,9 @@ var TOKEN_EXPIRATION_INTERVAL = 1000 * 60 * 60 * 24 * 7; // 1 week
 var HEARTBEAT_INTERVAL = 1000 * 20; // 20 seconds
 var SELF_HEAL_BACKOFFS = [0, 100, 500, 1000, 2000, 5000];
 var WS_CLOSE_REASON_USER = 1000;
+var IEX = "iex";
+var CRYPTOQUOTE = "cryptoquote";
+var PROVIDERS = [IEX, CRYPTOQUOTE];
 
 var IntrinioRealtime = function () {
   function IntrinioRealtime(options) {
@@ -44,7 +47,7 @@ var IntrinioRealtime = function () {
       }
     }
 
-    if (options.provider != "iex") {
+    if (!PROVIDERS.includes(options.provider)) {
       this._throw("Need a valid provider");
     }
 
@@ -160,6 +163,9 @@ var IntrinioRealtime = function () {
         if (provider == "iex") {
           url = "https://realtime.intrinio.com/auth";
         }
+        else if (provider == "cryptoquote") {
+          url = "https://crypto.intrinio.com/auth";
+        }
 
         if (api_key) {
           if (api_key.includes("?")) {
@@ -214,6 +220,9 @@ var IntrinioRealtime = function () {
         if (_this4.options.provider == "iex") {
           socket_url = "wss://realtime.intrinio.com/socket/websocket?vsn=1.0.0&token=" + encodeURIComponent(_this4.token);
         }
+        else if (_this4.options.provider == "cryptoquote") {
+          socket_url = "wss://crypto.intrinio.com/socket/websocket?vsn=1.0.0&token=" + encodeURIComponent(_this4.token);
+        }
 
         _this4.websocket = new WebSocket(socket_url);
 
@@ -240,6 +249,11 @@ var IntrinioRealtime = function () {
 
           if (_this4.options.provider == "iex") {
             if (message["event"] === 'quote') {
+              quote = message["payload"];
+            }
+          }
+          else if (_this4.options.provider == "cryptoquote") {
+            if (message["event"] === 'message') {
               quote = message["payload"];
             }
           }
@@ -301,7 +315,7 @@ var IntrinioRealtime = function () {
       var _this6 = this;
 
       this.afterConnected.then(function () {
-        if (_this6.options.provider == "iex") {
+        if (_this6.options.provider == "iex" || _this6.options.provider == "cryptoquote") {
           _this6.websocket.send(JSON.stringify({
             topic: 'phoenix',
             event: 'heartbeat',
@@ -366,6 +380,14 @@ var IntrinioRealtime = function () {
           ref: null
         };
       }
+      else if (this.options.provider == "cryptoquote") {
+        return {
+          topic: channel,
+          event: 'phx_join',
+          payload: {},
+          ref: null
+        };
+      }
     }
   }, {
     key: "_generateLeaveMessage",
@@ -373,6 +395,14 @@ var IntrinioRealtime = function () {
       if (this.options.provider == "iex") {
         return {
           topic: this._parseIexTopic(channel),
+          event: 'phx_leave',
+          payload: {},
+          ref: null
+        };
+      }
+      else if (this.options.provider == "cryptoquote") {
+        return {
+          topic: channel,
           event: 'phx_leave',
           payload: {},
           ref: null
