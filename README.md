@@ -45,8 +45,11 @@ You can create a Public Access Key after [creating an account](https://intrinio.
 Currently, we offers our web SDK for real-time stock prices from the following providers:
 
 * IEX - [Homepage](https://iextrading.com/)
+* Cryptoquote - [Homepage](https://cryptoquote.io/)
 
-## Quote Data Format
+Each has distinct price channels and quote formats, but a very similar API.
+
+Each data provider has a different format for their quote data.
 
 ### IEX
 
@@ -67,6 +70,152 @@ Currently, we offers our web SDK for real-time stock prices from the following p
 *   **size** - the size of the `last` trade, or total volume of orders at the top-of-book `bid` or `ask` price
 *   **price** - the price in USD
 
+### Cryptoquote
+
+#### Book Update
+```ruby
+{ pair: {
+    name: "BTCUSD",
+    code: "btcusd"
+  },
+  exchange: {
+    name: "Gemini",
+    code: "gemini"
+  },
+  side: "buy",
+  price: 6337.4,
+  size: 0.3,
+  type: "book_update" }
+```
+
+*   **pair** - details of the currency pair
+  *    **name** - the name of the currency pair
+  *    **code** - the code of the currency pair
+*   **exchange** - details of the exchange from which the message came from
+  *    **name** - the name of the exchange
+  *    **code** - the code of the exchange
+*   **side** - the side of the book this update is for
+  *    **`buy`** - this is an update to the buy side of the book
+  *    **`sell`** - this is an update to the sell side of the book
+*   **price** - the price of this book entry
+*   **size** - the size of this book entry
+*   **type** - the type of message this is
+  *    **`book_update`** - a message that denotes a change to an order book
+  *    **`ticker`** - a snapshot of the market as depicted by the Exchange
+  *    **`trade`** - a trade message (updating `last_trade_price`, `last_trade_time`, and `last_trade_size`)
+
+#### Ticker
+```ruby
+{ last_updated: "2018-10-29 23:08:02.277Z",
+  pair: {
+    name: "BTCUSD",
+    code: "btcusd"
+  },
+  exchange: {
+    name: "Binance",
+    code: "binance"
+  },
+  bid: 6326,
+  bid_size: 6.51933000,
+  ask: 6326.97,
+  ask_size: 6.12643000,
+  change: -151.6899999999996,
+  change_percent: -2.340895061728389,
+  volume: 13777.232772,
+  open: 6480,
+  high: 6505.01,
+  low: 6315,
+  last_trade_time: "2018-10-29 23:08:01.834Z",
+  last_trade_side: nil,
+  last_trade_price: 6326.97000000,
+  last_trade_size: 0.00001200,
+  type: "ticker" }
+```
+
+*   **last_updated** - a UTC timestamp of when the ticker was last updated
+*   **pair** - details of the currency pair
+  *    **name** - the name of the currency pair
+  *    **code** - the code of the currency pair
+*   **exchange** - details of the exchange from which the message came from
+  *    **name** - the name of the exchange
+  *    **code** - the code of the exchange
+*   **ask** - the ask for the currency pair on the exchange
+*   **ask_size** - the size of the ask for the currency pair on the exchange
+*   **bid** - the bid for the currency pair on the exchange
+*   **bid_size** - the size of the bid for the currency pair on the exchange
+*   **change** - the notional change in price since the last ticker
+*   **change_percent** - the percent change in price since the last ticker
+*   **volume** - the volume of the currency pair on the exchange
+*   **open** - the opening price of the currency pair on the exchange
+*   **high** - the highest price of the currency pair on the exchange
+*   **low** - the lowest price of the currency pair on the exchange
+*   **last_trade_time** - a UTC timestamp of the last trade for the currency pair on the exchange
+*   **last_trade_side** - the side of the last trade
+  *    **`buy`** - this is an update to the buy side of the book
+  *    **`sell`** - this is an update to the sell side of the book
+*   **last_trade_price** - the price of the last trade for the currency pair on the exchange
+*   **last_trade_size** - the size of the last trade for the currency pair on the exchange
+*   **type** - the type of message this is
+  *    **`book_update`** - a message that denotes a change to an order book
+  *    **`ticker`** - a snapshot of the market as depicted by the Exchange
+  *    **`trade`** - a trade message (updating `last_trade_price`, `last_trade_time`, and `last_trade_size`)
+
+#### Trade
+```ruby
+{ last_updated: "2018-10-29 23:08:02.277Z",
+  pair: {
+    name: "BTCUSD",
+    code: "btcusd"
+  },
+  exchange: {
+    name: "Gemini",
+    code: "gemini"
+  },
+  bid: nil,
+  bid_size: nil,
+  ask: nil,
+  ask_size: nil,
+  change: -133.40760000000046,
+  change_percent: -2.059762280845255,
+  volume: 22121.79710206001,
+  open: 6476.8445,
+  high: 6506.2724,
+  low: 6311,
+  last_trade_time: "2018-10-29 23:08:01.834Z",
+  last_trade_side: "sell",
+  last_trade_price: 6343.7124,
+  last_trade_size: 1.6045,
+  type: "trade" }
+```
+
+*   **last_updated** - a UTC timestamp of when the ticker was last updated
+*   **pair** - details of the currency pair
+  *    **name** - the name of the currency pair
+  *    **code** - the code of the currency pair
+*   **exchange** - details of the exchange from which the message came from
+  *    **name** - the name of the exchange
+  *    **code** - the code of the exchange
+*   **ask** - the ask for the currency pair on the exchange
+*   **ask_size** - the size of the ask for the currency pair on the exchange
+*   **bid** - the bid for the currency pair on the exchange
+*   **bid_size** - the size of the bid for the currency pair on the exchange
+*   **change** - the notional change in price since the last ticker
+*   **change_percent** - the percent change in price since the last ticker
+*   **volume** - the volume of the currency pair on the exchange
+*   **open** - the opening price of the currency pair on the exchange
+*   **high** - the highest price of the currency pair on the exchange
+*   **low** - the lowest price of the currency pair on the exchange
+*   **last_trade_time** - a UTC timestamp of the last trade for the currency pair on the exchange
+*   **last_trade_side** - the side of the last trade
+  *    **`buy`** - this is an update to the buy side of the book
+  *    **`sell`** - this is an update to the sell side of the book
+*   **last_trade_price** - the price of the last trade for the currency pair on the exchange
+*   **last_trade_size** - the size of the last trade for the currency pair on the exchange
+*   **type** - the type of message this is
+  *    **`book_update`** - a message that denotes a change to an order book
+  *    **`ticker`** - a snapshot of the market as depicted by the Exchange
+  *    **`trade`** - a trade message (updating `last_trade_price`, `last_trade_time`, and `last_trade_size`)
+
 ## Channels
 
 ### IEX
@@ -78,12 +227,22 @@ To receive price quotes from IEX, you need to instruct the client to "join" a ch
 
 Special access is required for both lobby channels. [Contact us](mailto:sales@intrinio.com) for more information.
 
+### Cryptoquote
+
+To receive price quotes from Cryptoquote, you need to instruct the client to "join" a channel. A channel can be
+* The lobby (`crypto:lobby`) where all message types for all currency pairs are posted
+* The type lobby (`crypto:lobby:{message_type}`) where all messages for the given type for all currency pairs are posted (i.e. `crypto:lobby:trade`)
+* The pair lobby (`crypto:pair:{pair_code}`) where all message types for the provided currency pair are posted (i.e. `crypto:pair:btcusd`)
+* The book_update pair lobby (`crypto:pair:book_update:{pair_code}`) where book_updates for the provided currency pair are posted (i.e. `crypto:pair:book_update:btcusd`)
+* The ticker pair lobby (`crypto:pair:ticker:{pair_code}`) where tickers for the provided currency pair are posted (i.e. `crypto:pair:ticker:btcusd`)
+* The trade pair lobby (`crypto:pair:trade:{pair_code}`) where trades for the provided currency pair are posted (i.e. `crypto:pair:trade:btcusd`)
+
 ## Documentation
 
 ### Methods
 
 `constructor(options)` - Creates a new instance of the IntrinioRealtime client.
-* **Parameter** `options`: An object with a `api_key` property corresponding to your Intrinio API Key or a `public_key` property corresponding to your Intrinio Public Access Key, as well as a `provider` property designating which realtime vendor to use (currently only "iex" is supported).
+* **Parameter** `options`: An object with a `api_key` property corresponding to your Intrinio API Key or a `public_key` property corresponding to your Intrinio Public Access Key, as well as a `provider` property designating which realtime vendor to use ("iex" or "cryptoquote").
 ```javascript
 var ir = new IntrinioRealtime({
   api_key: "YOUR_INTRINIO_API_KEY",
