@@ -253,7 +253,7 @@ var IntrinioRealtime = function () {
             }
           }
           else if (_this4.options.provider == "cryptoquote") {
-            if (message["event"] === 'message') {
+            if (message["event"] === 'book_update' || message["event"] === 'ticker' || message["event"] === 'trade') {
               quote = message["payload"];
             }
           }
@@ -349,7 +349,7 @@ var IntrinioRealtime = function () {
       });
 
       channels.forEach(function (channel) {
-        if (channel.length == 0 || channel.length > 20) {
+        if (channel.length == 0) {
           _this7._throw("Invalid channel provided");
         }
       });
