@@ -42,6 +42,11 @@ You can create a Public Access Key after [creating an account](https://intrinio.
 Currently, we offers our web SDK for real-time stock prices from the following providers:
 
 * IEX - [Homepage](https://iextrading.com/)
+* Cryptoquote - [Homepage](https://cryptoquote.io/)
+
+Each has distinct price channels and quote formats, but a very similar API.
+
+Each data provider has a different format for their quote data.
 
 ## Quote Data Format
 
@@ -64,6 +69,85 @@ Currently, we offers our web SDK for real-time stock prices from the following p
 *   **size** - the size of the `last` trade, or total volume of orders at the top-of-book `bid` or `ask` price
 *   **price** - the price in USD
 
+### Cryptoquote
+
+#### Level 1 - Price Update
+
+NOTE: Null values for some fields denote no change from previous value.
+
+```javascript
+{ last_updated: "2018-10-29 23:08:02.277Z",
+  pair_name: "BTCUSD",
+  pair_code: "btcusd",
+  exchange_name: "Binance",
+  exchange_code: "binance",
+  bid: 6326,
+  bid_size: 6.51933000,
+  ask: 6326.97,
+  ask_size: 6.12643000,
+  change: -151.6899999999996,
+  change_percent: -2.340895061728389,
+  volume: 13777.232772,
+  open: 6480,
+  high: 6505.01,
+  low: 6315,
+  last_trade_time: "2018-10-29 23:08:01.834Z",
+  last_trade_side: null,
+  last_trade_price: 6326.97000000,
+  last_trade_size: 0.00001200,
+  type: "level_1" }
+```
+
+*   **last_updated** - a UTC timestamp of when the data was last updated
+*   **pair_name** - the name of the currency pair
+*   **pair_code** - the code of the currency pair
+*   **exchange_name** - the name of the exchange
+*   **exchange_code** - the code of the exchange
+*   **ask** - the ask for the currency pair on the exchange
+*   **ask_size** - the size of the ask for the currency pair on the exchange
+*   **bid** - the bid for the currency pair on the exchange
+*   **bid_size** - the size of the bid for the currency pair on the exchange
+*   **change** - the notional change in price since the last ticker
+*   **change_percent** - the percent change in price since the last ticker
+*   **volume** - the volume of the currency pair on the exchange
+*   **open** - the opening price of the currency pair on the exchange
+*   **high** - the highest price of the currency pair on the exchange
+*   **low** - the lowest price of the currency pair on the exchange
+*   **last_trade_time** - a UTC timestamp of the last trade for the currency pair on the exchange
+*   **last_trade_side** - the side of the last trade
+  *    **`buy`** - this is an update to the buy side of the book
+  *    **`sell`** - this is an update to the sell side of the book
+*   **last_trade_price** - the price of the last trade for the currency pair on the exchange
+*   **last_trade_size** - the size of the last trade for the currency pair on the exchange
+*   **type** - the type of message this is
+  *    **`level_1`** - a messages that denotes a change to the last traded price or top-of-the-book bid or ask
+  *    **`level_2`** - a message that denotes a change to an order book
+
+#### Level 2 - Book Update
+```javascript
+{ pair_name: "BTCUSD",
+  pair_code: "btcusd",
+  exchange_name: "Gemini",
+  exchange_code: "gemini",
+  side: "buy",
+  price: 6337.4,
+  size: 0.3,
+  type: "level_2" }
+```
+
+*   **pair_name** - the name of the currency pair
+*   **pair_code** - the code of the currency pair
+*   **exchange_name** - the name of the exchange
+*   **exchange_code** - the code of the exchange
+*   **side** - the side of the book this update is for
+  *    **`buy`** - this is an update to the buy side of the book
+  *    **`sell`** - this is an update to the sell side of the book
+*   **price** - the price of this book entry
+*   **size** - the size of this book entry
+*   **type** - the type of message this is
+  *    **`level_1`** - a messages that denotes a change to the last traded price or top-of-the-book bid or ask
+  *    **`level_2`** - a message that denotes a change to an order book
+
 ## Channels
 
 ### IEX
@@ -75,12 +159,26 @@ To receive price quotes from IEX, you need to instruct the client to "join" a ch
 
 Special access is required for both lobby channels. [Contact us](mailto:sales@intrinio.com) for more information.
 
+### Cryptoquote
+
+To receive price quotes from Cryptoquote, you need to instruct the client to "join" a channel. A channel can be
+
+* `crypto:market_level_1:{pair_code}` - the Level 1 Market channel where all Level 1 price updates for the provided currency pair in all exchanges are posted (i.e. `crypto:pair:market_level_1:btcusd`)
+* `crypto:exchange_level_1:{exchange_code}:{pair_code}` - the Level 1 Market channel where all Level 1 price updates for the provided currency pair and exchange are posted
+* `crypto:exchange_level_2:{exchange_code}:{pair_code}` - the Level 2 Market channel where all Level 2 book updates for the provided currency pair and exchange are posted
+* `crypto:firehose` - the Firehose channel where all message types for all currency pairs are posted (special access required)
+
+The Intrinio REST API provides a listing of pairs, exchanges, and their corresponding codes:
+
+* [Crypto Currency Pairs](https://intrinio.com/documentation/download#crypto_currency_pairs)
+* [Crypto Exchanges](https://intrinio.com/documentation/download#crypto_exchanges)
+
 ## Documentation
 
 ### Methods
 
 `constructor(options)` - Creates a new instance of the IntrinioRealtime client.
-* **Parameter** `options`: An object with a `public_key` property corresponding to your Intrinio Public Access Key, as well as a `provider` property designating which realtime vendor to use (currently only "iex" is supported).
+* **Parameter** `options`: An object with a `public_key` property corresponding to your Intrinio Public Access Key, as well as a `provider` property designating which realtime vendor to use ("iex" or "cryptoquote").
 ```javascript
 var ir = new IntrinioRealtime({
   public_key: "YOUR_INTRINIO_PUBLIC_ACCESS_KEY",
