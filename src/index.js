@@ -4,6 +4,9 @@ const TOKEN_EXPIRATION_INTERVAL = 1000 * 60 * 60 * 24 * 7 // 1 week
 const HEARTBEAT_INTERVAL = 1000 * 20 // 20 seconds
 const SELF_HEAL_BACKOFFS = [0,100,500,1000,2000,5000]
 const WS_CLOSE_REASON_USER = 1000
+const IEX = "iex"
+const CRYPTOQUOTE = "cryptoquote"
+const PROVIDERS = [IEX, CRYPTOQUOTE]
 
 class IntrinioRealtime {
   constructor(options) {
@@ -26,7 +29,7 @@ class IntrinioRealtime {
       this._throw("Need a valid public_key")
     }
 
-    if (options.provider != "iex") {
+    if (!PROVIDERS.includes(options.provider)) {
       this._throw("Need a valid provider")
     }
 
@@ -106,7 +109,10 @@ class IntrinioRealtime {
       if (provider == "iex") {
         url = "https://realtime.intrinio.com/auth"
       }
-      
+      else if (provider == "cryptoquote") {
+        url = "https://crypto.intrinio.com/auth"
+      }
+
       var xmlhttp = new XMLHttpRequest()
       xmlhttp.onreadystatechange = () => {
         if (xmlhttp.readyState == 4) {
@@ -144,6 +150,9 @@ class IntrinioRealtime {
       if (this.options.provider == "iex") {
         socket_url = "wss://realtime.intrinio.com/socket/websocket?vsn=1.0.0&token=" + encodeURIComponent(this.token)
       }
+      else if (this.options.provider == "cryptoquote") {
+        socket_url = "wss://crypto.intrinio.com/socket/websocket?vsn=1.0.0&token=" + encodeURIComponent(this.token)
+      }
 
       this.websocket = new WebSocket(socket_url)
 
@@ -173,7 +182,12 @@ class IntrinioRealtime {
             quote = message["payload"]
           }
         }
-        
+        else if (this.options.provider == "cryptoquote") {
+          if (message["event"] === 'book_update' || message["event"] === 'ticker' || message["event"] === 'trade') {
+            quote = message["payload"]
+          }
+        }
+
         if (quote) {
           if (typeof this.quote_callback === 'function') {
             this.quote_callback(quote)
@@ -222,7 +236,7 @@ class IntrinioRealtime {
 
   _heartbeat() {
     this.afterConnected.then(() => {
-      if (this.options.provider == "iex") {
+      if (this.options.provider == "iex" || this.options.provider == "cryptoquote") {
         this.websocket.send(JSON.stringify({
           topic: 'phoenix',
           event: 'heartbeat',
@@ -256,7 +270,7 @@ class IntrinioRealtime {
     })
 
     channels.forEach(channel => {
-      if (channel.length == 0 || channel.length > 20) {
+      if (channel.length == 0) {
         this._throw("Invalid channel provided")
       }
     })
@@ -287,12 +301,28 @@ class IntrinioRealtime {
         ref: null
       }
     }
+    else if (this.options.provider == "cryptoquote") {
+      return {
+        topic: channel,
+        event: 'phx_join',
+        payload: {},
+        ref: null
+      }
+    }
   }
   
   _generateLeaveMessage(channel) {
     if (this.options.provider == "iex") {
       return {
         topic: this._parseIexTopic(channel),
+        event: 'phx_leave',
+        payload: {},
+        ref: null
+      }
+    }
+    else if (this.options.provider == "cryptoquote") {
+      return {
+        topic: channel,
         event: 'phx_leave',
         payload: {},
         ref: null
