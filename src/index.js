@@ -6,7 +6,8 @@ const SELF_HEAL_BACKOFFS = [0,100,500,1000,2000,5000]
 const WS_CLOSE_REASON_USER = 1000
 const IEX = "iex"
 const CRYPTOQUOTE = "cryptoquote"
-const PROVIDERS = [IEX, CRYPTOQUOTE]
+const FXCM = "fxcm"
+const PROVIDERS = [IEX, CRYPTOQUOTE, FXCM]
 
 class IntrinioRealtime {
   constructor(options) {
@@ -112,6 +113,9 @@ class IntrinioRealtime {
       else if (provider == "cryptoquote") {
         url = "https://crypto.intrinio.com/auth"
       }
+      else if (provider == "fxcm") {
+        url = "https://fxcm.intrinio.com/auth"
+      }
 
       var xmlhttp = new XMLHttpRequest()
       xmlhttp.onreadystatechange = () => {
@@ -153,6 +157,9 @@ class IntrinioRealtime {
       else if (this.options.provider == "cryptoquote") {
         socket_url = "wss://crypto.intrinio.com/socket/websocket?vsn=1.0.0&token=" + encodeURIComponent(this.token)
       }
+      else if (this.options.provider == "fxcm") {
+        socket_url = "wss://fxcm.intrinio.com/socket/websocket?vsn=1.0.0&token=" + encodeURIComponent(this.token)
+      }
 
       this.websocket = new WebSocket(socket_url)
 
@@ -184,6 +191,11 @@ class IntrinioRealtime {
         }
         else if (this.options.provider == "cryptoquote") {
           if (message["event"] === 'book_update' || message["event"] === 'ticker' || message["event"] === 'trade') {
+            quote = message["payload"]
+          }
+        }
+        else if (this.options.provider == "fxcm") {
+          if (message["event"] === 'price_update') {
             quote = message["payload"]
           }
         }
@@ -236,7 +248,7 @@ class IntrinioRealtime {
 
   _heartbeat() {
     this.afterConnected.then(() => {
-      if (this.options.provider == "iex" || this.options.provider == "cryptoquote") {
+      if (this.options.provider == "iex" || this.options.provider == "cryptoquote" || this.options.provider == "fxcm") {
         this.websocket.send(JSON.stringify({
           topic: 'phoenix',
           event: 'heartbeat',
@@ -309,6 +321,14 @@ class IntrinioRealtime {
         ref: null
       }
     }
+    else if (this.options.provider == "fxcm") {
+      return {
+        topic: channel,
+        event: 'phx_join',
+        payload: {},
+        ref: null
+      }
+    }
   }
   
   _generateLeaveMessage(channel) {
@@ -321,6 +341,14 @@ class IntrinioRealtime {
       }
     }
     else if (this.options.provider == "cryptoquote") {
+      return {
+        topic: channel,
+        event: 'phx_leave',
+        payload: {},
+        ref: null
+      }
+    }
+    else if (this.options.provider == "fxcm") {
       return {
         topic: channel,
         event: 'phx_leave',
