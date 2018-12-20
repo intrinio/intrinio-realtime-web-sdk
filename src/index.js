@@ -248,7 +248,7 @@ class IntrinioRealtime {
 
   _heartbeat() {
     this.afterConnected.then(() => {
-      if (this.options.provider == "iex" || this.options.provider == "cryptoquote" || this.options.provider == "fxcm") {
+      if (["iex", "cryptoquote", "fxcm"].includes(this.options.provider)) {
         this.websocket.send(JSON.stringify({
           topic: 'phoenix',
           event: 'heartbeat',
@@ -313,15 +313,7 @@ class IntrinioRealtime {
         ref: null
       }
     }
-    else if (this.options.provider == "cryptoquote") {
-      return {
-        topic: channel,
-        event: 'phx_join',
-        payload: {},
-        ref: null
-      }
-    }
-    else if (this.options.provider == "fxcm") {
+    else if (["cryptoquote", "fxcm"].includes(this.options.provider)) {
       return {
         topic: channel,
         event: 'phx_join',
@@ -340,15 +332,7 @@ class IntrinioRealtime {
         ref: null
       }
     }
-    else if (this.options.provider == "cryptoquote") {
-      return {
-        topic: channel,
-        event: 'phx_leave',
-        payload: {},
-        ref: null
-      }
-    }
-    else if (this.options.provider == "fxcm") {
+    else if (["cryptoquote", "fxcm"].includes(this.options.provider)) {
       return {
         topic: channel,
         event: 'phx_leave',

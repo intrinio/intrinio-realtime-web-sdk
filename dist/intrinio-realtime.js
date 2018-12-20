@@ -288,7 +288,7 @@ var IntrinioRealtime = function () {
       var _this6 = this;
 
       this.afterConnected.then(function () {
-        if (_this6.options.provider == "iex" || _this6.options.provider == "cryptoquote" || _this6.options.provider == "fxcm") {
+        if (["iex", "cryptoquote", "fxcm"].includes(_this6.options.provider)) {
           _this6.websocket.send(JSON.stringify({
             topic: 'phoenix',
             event: 'heartbeat',
@@ -352,14 +352,7 @@ var IntrinioRealtime = function () {
           payload: {},
           ref: null
         };
-      } else if (this.options.provider == "cryptoquote") {
-        return {
-          topic: channel,
-          event: 'phx_join',
-          payload: {},
-          ref: null
-        };
-      } else if (this.options.provider == "fxcm") {
+      } else if (["cryptoquote", "fxcm"].includes(this.options.provider)) {
         return {
           topic: channel,
           event: 'phx_join',
@@ -378,14 +371,7 @@ var IntrinioRealtime = function () {
           payload: {},
           ref: null
         };
-      } else if (this.options.provider == "cryptoquote") {
-        return {
-          topic: channel,
-          event: 'phx_leave',
-          payload: {},
-          ref: null
-        };
-      } else if (this.options.provider == "fxcm") {
+      } else if (["cryptoquote", "fxcm"].includes(this.options.provider)) {
         return {
           topic: channel,
           event: 'phx_leave',
