@@ -42,7 +42,7 @@ var IntrinioRealtime = function () {
     }
 
     if (!PROVIDERS.includes(options.provider)) {
-      this._throw("Need a valid provider");
+      this._throw("Need a valid provider: iex, quodd, cryptoquote, or fxcm");
     }
 
     // Establish connection
@@ -217,7 +217,11 @@ var IntrinioRealtime = function () {
           var message = JSON.parse(event.data);
           var quote = null;
 
-          if (_this4.options.provider == "iex") {
+          if (message.event == "phx_reply" && message.payload.status == "error") {
+            var error = message.payload.response;
+            console.error("IntrinioRealtime | Websocket data error: " + error);
+            _this4._throw(error);
+          } else if (_this4.options.provider == "iex") {
             if (message["event"] === 'quote') {
               quote = message["payload"];
             }

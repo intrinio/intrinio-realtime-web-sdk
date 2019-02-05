@@ -31,7 +31,7 @@ class IntrinioRealtime {
     }
 
     if (!PROVIDERS.includes(options.provider)) {
-      this._throw("Need a valid provider")
+      this._throw("Need a valid provider: iex, quodd, cryptoquote, or fxcm")
     }
 
     // Establish connection
@@ -179,12 +179,17 @@ class IntrinioRealtime {
         console.error("IntrinioRealtime | Websocket error: " + e + "\n" + e.stack.split("\n"))
         reject(e)
       }
-      
+
       this.websocket.onmessage = (event) => {
         var message = JSON.parse(event.data)
         var quote = null
-        
-        if (this.options.provider == "iex") {
+
+        if (message.event == "phx_reply" && message.payload.status == "error") {
+          var error = message.payload.response
+          console.error("IntrinioRealtime | Websocket data error: " + error)
+          this._throw(error)
+        }
+        else if (this.options.provider == "iex") {
           if (message["event"] === 'quote') {
             quote = message["payload"]
           }
