@@ -31,7 +31,7 @@ class IntrinioRealtime {
     }
 
     if (!PROVIDERS.includes(options.provider)) {
-      this._throw("Need a valid provider: iex, quodd, cryptoquote, or fxcm")
+      this._throw("Need a valid provider: iex, cryptoquote, or fxcm")
     }
 
     // Establish connection
