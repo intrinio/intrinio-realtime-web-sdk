@@ -1,12 +1,12 @@
-# Intrinio Web SDK for Real-Time Stock Prices
+# Intrinio Web SDK for Real-Time Stock, Forex, and Crypto Prices
 
-[Intrinio](https://intrinio.com/) provides real-time stock prices via a two-way WebSocket connection.
+[Intrinio](https://intrinio.com/) provides rreal-time stock, forex, and crypto prices via a two-way WebSocket connection.
 
 ## Features
 
 * Receive streaming, real-time price quotes (last trade, bid, ask)
-* Subscribe to updates from individual securities
-* Subscribe to updates for all securities (contact us for special access)
+* Subscribe to updates from individual securities, forex pairs, or cryptos
+* Subscribe to updates for all securities, forex pairs, or cryptos (contact us for special access)
 
 ## Script
 To use the SDK, include the script (found in `/dist` folder of this repository) at the end of your `<body>` tag.
@@ -186,8 +186,8 @@ To receive price quotes from Cryptoquote, you need to instruct the client to "jo
 
 The Intrinio REST API provides a listing of pairs, exchanges, and their corresponding codes:
 
-* [Crypto Currency Pairs](https://intrinio.com/documentation/download#crypto_currency_pairs)
-* [Crypto Exchanges](https://intrinio.com/documentation/download#crypto_exchanges)
+* [Crypto Currency Pairs](https://docs.intrinio.com/documentation/download/crypto_pairs)
+* [Crypto Exchanges](https://docs.intrinio.com/documentation/download/crypto_exchanges)
 
 ### FXCM
 
@@ -199,8 +199,8 @@ To receive price quotes from FXCM, you need to instruct the client to "join" a c
 
 The Intrinio REST API provides a listing of pairs, currencies, and their corresponding codes:
 
-* [FX Currencies](https://intrinio.com/documentation/api/currencies)
-* [FX Currency Pairs](https://intrinio.com/documentation/api/currency_pairs)
+* [FX Currencies](https://docs.intrinio.com/documentation/download/currencies)
+* [FX Currency Pairs](https://docs.intrinio.com/documentation/download/currency_pairs)
 
 ## Documentation
 
