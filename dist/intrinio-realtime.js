@@ -13,7 +13,8 @@ var SELF_HEAL_BACKOFFS = [0, 100, 500, 1000, 2000, 5000];
 var WS_CLOSE_REASON_USER = 1000;
 var IEX = "iex";
 var CRYPTOQUOTE = "cryptoquote";
-var PROVIDERS = [IEX, CRYPTOQUOTE];
+var FXCM = "fxcm";
+var PROVIDERS = [IEX, CRYPTOQUOTE, FXCM];
 
 var IntrinioRealtime = function () {
   function IntrinioRealtime(options) {
@@ -41,7 +42,7 @@ var IntrinioRealtime = function () {
     }
 
     if (!PROVIDERS.includes(options.provider)) {
-      this._throw("Need a valid provider");
+      this._throw("Need a valid provider: iex, cryptoquote, or fxcm");
     }
 
     // Establish connection
@@ -144,6 +145,8 @@ var IntrinioRealtime = function () {
           url = "https://realtime.intrinio.com/auth";
         } else if (provider == "cryptoquote") {
           url = "https://crypto.intrinio.com/auth";
+        } else if (provider == "fxcm") {
+          url = "https://fxcm.intrinio.com/auth";
         }
 
         var xmlhttp = new XMLHttpRequest();
@@ -187,6 +190,8 @@ var IntrinioRealtime = function () {
           socket_url = "wss://realtime.intrinio.com/socket/websocket?vsn=1.0.0&token=" + encodeURIComponent(_this4.token);
         } else if (_this4.options.provider == "cryptoquote") {
           socket_url = "wss://crypto.intrinio.com/socket/websocket?vsn=1.0.0&token=" + encodeURIComponent(_this4.token);
+        } else if (_this4.options.provider == "fxcm") {
+          socket_url = "wss://fxcm.intrinio.com/socket/websocket?vsn=1.0.0&token=" + encodeURIComponent(_this4.token);
         }
 
         _this4.websocket = new WebSocket(socket_url);
@@ -212,12 +217,20 @@ var IntrinioRealtime = function () {
           var message = JSON.parse(event.data);
           var quote = null;
 
-          if (_this4.options.provider == "iex") {
+          if (message.event == "phx_reply" && message.payload.status == "error") {
+            var error = message.payload.response;
+            console.error("IntrinioRealtime | Websocket data error: " + error);
+            _this4._throw(error);
+          } else if (_this4.options.provider == "iex") {
             if (message["event"] === 'quote') {
               quote = message["payload"];
             }
           } else if (_this4.options.provider == "cryptoquote") {
             if (message["event"] === 'book_update' || message["event"] === 'ticker' || message["event"] === 'trade') {
+              quote = message["payload"];
+            }
+          } else if (_this4.options.provider == "fxcm") {
+            if (message["event"] === 'price_update') {
               quote = message["payload"];
             }
           }
@@ -279,7 +292,7 @@ var IntrinioRealtime = function () {
       var _this6 = this;
 
       this.afterConnected.then(function () {
-        if (_this6.options.provider == "iex" || _this6.options.provider == "cryptoquote") {
+        if (["iex", "cryptoquote", "fxcm"].includes(_this6.options.provider)) {
           _this6.websocket.send(JSON.stringify({
             topic: 'phoenix',
             event: 'heartbeat',
@@ -343,7 +356,7 @@ var IntrinioRealtime = function () {
           payload: {},
           ref: null
         };
-      } else if (this.options.provider == "cryptoquote") {
+      } else if (["cryptoquote", "fxcm"].includes(this.options.provider)) {
         return {
           topic: channel,
           event: 'phx_join',
@@ -362,7 +375,7 @@ var IntrinioRealtime = function () {
           payload: {},
           ref: null
         };
-      } else if (this.options.provider == "cryptoquote") {
+      } else if (["cryptoquote", "fxcm"].includes(this.options.provider)) {
         return {
           topic: channel,
           event: 'phx_leave',
