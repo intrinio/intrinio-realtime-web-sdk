@@ -1,6 +1,6 @@
 # Intrinio Web SDK for Real-Time Stock, Forex, and Crypto Prices
 
-[Intrinio](https://intrinio.com/) provides rreal-time stock, forex, and crypto prices via a two-way WebSocket connection.
+[Intrinio](https://intrinio.com/) provides real-time stock, forex, and crypto prices via a two-way WebSocket connection.
 
 ## Features
 
