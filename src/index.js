@@ -188,6 +188,9 @@ class IntrinioRealtime {
 
         if (message.event == "phx_reply" && message.payload.status == "error") {
           var error = message.payload.response
+          if(error === 'L') {
+            error = 'WebSocket is not part of the packages you have. Buy the WebSocket package or contact Intrinio to request a trial.'
+          }
           console.error("IntrinioRealtime | Websocket data error: " + error)
           this._throw(error)
         }
