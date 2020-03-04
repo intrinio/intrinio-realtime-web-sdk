@@ -134,7 +134,9 @@ class IntrinioRealtime {
           }
         }
       }
+      url += "?api_key=" + public_key; // Fix "IntrinioRealtime | Unable to authorize" in all browsers
       xmlhttp.open("GET", url, true)
+      xmlhttp.overrideMimeType("text/html"); // Fix "XML Parsing Error: syntax error" in Firefox
       xmlhttp.setRequestHeader('Content-Type', 'application/json')
       xmlhttp.setRequestHeader('Authorization', 'Public ' + public_key)
       xmlhttp.send()
