@@ -134,7 +134,9 @@ class IntrinioRealtime {
           }
         }
       }
+      url += "?api_key=" + public_key; // Fix "IntrinioRealtime | Unable to authorize" in all browsers
       xmlhttp.open("GET", url, true)
+      xmlhttp.overrideMimeType("text/html"); // Fix "XML Parsing Error: syntax error" in Firefox
       xmlhttp.setRequestHeader('Content-Type', 'application/json')
       xmlhttp.setRequestHeader('Authorization', 'Public ' + public_key)
       xmlhttp.send()
@@ -186,6 +188,9 @@ class IntrinioRealtime {
 
         if (message.event == "phx_reply" && message.payload.status == "error") {
           var error = message.payload.response
+          if(error === 'L') {
+            error = 'WebSocket is not part of the packages you have. Buy the WebSocket package or contact Intrinio to request a trial.'
+          }
           console.error("IntrinioRealtime | Websocket data error: " + error)
           this._throw(error)
         }
